@@ -35,6 +35,7 @@
     X.prototype.deepCopy = function(){
         return new X(this.X)
     }
+
     X.prototype.sust = function(x,m){
         if(this.X == x){
             res = m    
@@ -43,9 +44,7 @@
         }
         return res
     }
-    X.prototype.reducir = function(x,m){
-        //Habria que reducir lo de adentro o dejar lo mismo?
-    }
+    
 
     //APP
     app = function(m,n){
@@ -59,8 +58,19 @@
     app.prototype.sust = function(x,m){
         return new app(this.M.sust(x,m),this.N.sust(x,m))
     }
-    app.prototype.reducir = function(x,m){
-        //Habria que chequear si usar E-APP1/E-APP2/E-APPABS
+    app.prototype.reducir = function(){
+            if (this.M.hasOwnProperty('reducir')){
+                return this.M = this.M.reducir()            
+            }
+            if (this.N.hasOwnProperty('reducir')){
+                return this.N = this.N.reducir()
+            }
+            sustituido = this.M.M.sust(this.M.X, this.N)
+            if (sustituido.hasOwnProperty('reducir')){
+                return sustituido   
+            }else{
+                return sustituido
+            }
     }
 
     //ABS
@@ -89,8 +99,11 @@ term2 = new abs("y",new Flecha(new Flecha(Bool,Bool),Bool),new app(new X("x"),TT
 term3 = new abs("x",Bool,TT)
 fB = new Flecha(Bool,Bool)
 x = new X("x")
+z = new X("z")
 term4 = new abs("x",Bool,x)
 term5 = new abs("y",Bool,x)
+term6 = new app(new abs ("x",Bool,x), TT)
+term7 = new app(new abs("z", Bool,z), (new abs ("x",Bool,x), TT))
 
 console.log("Tests toString() ej 2")
 console.log(Bool.toString() == "Bool")
@@ -118,3 +131,8 @@ console.log((term5.sust("x",term4)).toString() == "\\y:Bool.\\x:Bool.x")
 console.log(term.sust("x",FF).toString() == "\\x:((Bool -> Bool) -> Bool).(x true)")
 console.log(term2.sust("x",FF).toString() == "\\y:((Bool -> Bool) -> Bool).(false true)")
 console.log((term3.sust("x",FF)).toString() == "\\x:Bool.true")
+
+//prueba de reduccion
+console.log("Prueba de reduccion")
+console.log(term6.reducir().toString() == "true")
+console.log(term7.reducir().toString() == "true")
