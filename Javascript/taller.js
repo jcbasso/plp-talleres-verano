@@ -8,16 +8,18 @@
     }
 
     casoBase = function(o){
-        return o["copiable"]
+        return o.caso_base
     }
 
-    deepCopyT = function(o) {
-        res = {}
-        for (k in o){
-            if(!casoBase(o[k]) ){
-                o[k] = deepCopyT(o[k])
-            }else{
-                res[k] = o[k]
+    deepCopyT = function(o){
+        var res = {}
+        for (var k in o){
+            if(o.hasOwnProperty(k)){
+                if(!casoBase(o[k]) && (casoBase(o[k]) != undefined)){
+                    res[k] = deepCopyT(o[k])
+                }else{
+                    res[k] = o[k]
+                }
             }
         }
         return res
@@ -34,7 +36,7 @@
     Bool.toString = function(){return "Bool"}
     Bool.deepCopy = function(){return this}
     Bool.__
-    Bool.copiable = false
+    Bool.caso_base = true
 
     //Flechaf
     Flecha = function(a,b){
@@ -53,14 +55,14 @@
     TT.toString = function(){return "true"}
     TT.deepCopy = function(){return this}
     TT.sust = function(x,m){return this}
-    TT.copiable = false
+    TT.caso_base = true
     TT.__proto__ = Evaluador
     //FALSE
     FF = {}
     FF.toString = function(){return "false"}
     FF.deepCopy = function(){return this}
     FF.sust = function(x,m){return this}
-    FF.copiable = false
+    FF.caso_base = true
     FF.__proto__ = Evaluador
 
     //VAR
@@ -73,7 +75,7 @@
             else res = this.X
             return res
         }
-        this.copiable = true
+        this.caso_base = false
     }
     X.prototype = Evaluador
 
@@ -106,7 +108,7 @@
             }
             return this
         }
-        this.copiable = true
+        this.caso_base = false
 
     }
     app.prototype = Evaluador
@@ -131,7 +133,7 @@
             return res
         }
 
-        this.copiable = true
+        this.caso_base = false
     }
     abs.prototype = Evaluador
 
@@ -193,8 +195,7 @@ term9 = new app(x,TT )
 
 //Prueba deepCopy
 console.log("Tests deepCopy() ej 7")
- term9_copiado = term9.deepCopy()
+ term9_copiado = term9.deepCopyT()
  term9.M = z
  console.log(term9.toString() == "(z true)")
  console.log(term9_copiado.toString() == "(x true)")
-
