@@ -5,7 +5,6 @@ mapaEjemplo([
 
 %% Ejercicio 1
 %% estaciones(+Bs, -Es)
-
 estaciones(Bs, Es):- setof(E, estacionConRepetidos(Bs, E), Es).
 
 estacionConRepetidos([bicisenda(E1,_,_)|_], E1).
@@ -24,13 +23,12 @@ estacionesVecinas(Bs, E, Es):- setof(Re, estacionVecina(Bs, E, Re), Es).
 
 estacionVecina(Bs, E, Re):- dataDeEstaciones(Bs, E, Re, _).
 
-dataDeEstaciones(Bs, E1, E2, D):- member(bicisenda(E1,E2,D),Bs).
-dataDeEstaciones(Bs, E1, E2, D):- member(bicisenda(E2,E1,D),Bs).
+dataDeEstaciones(Bs, E1, E2, N):- member(bicisenda(E1,E2,N),Bs).
+dataDeEstaciones(Bs, E1, E2, N):- member(bicisenda(E2,E1,N),Bs).
 
 %% Ejercicio 3
 %% distanciaVecinas(+Bs, ?E1, ?E2, ?N)
-
-distanciaVecinas(Bs, E1, E2, D):- dataDeEstaciones(Bs, E1, E2, D).
+distanciaVecinas(Bs, E1, E2, N):- dataDeEstaciones(Bs, E1, E2, N).
 
 %% Ejercicio 4
 %% caminoSimple(+Bs, +O, +D, ?C)
@@ -48,3 +46,9 @@ borrarTodasLasBicisendasDe([bicisenda(_,E,_)|Bs], E, Bss):- borrarTodasLasBicise
 %% Ejercicio 6
 %% caminoHamiltoniano(+Bs, +O, +D, ?C)
 caminoHamiltoniano(Bs, O, D, C):- caminoSimple(Bs, O, D, C), forall(estacion(Bs,E), member(E,C)).
+
+%% Ejercicio 7
+%% caminosHamiltonianos(+Bs, ?C)
+caminosHamiltonianos(Bs, C):- setof(C2, todosLosCaminosHamiltonianos(Bs,C2), Cs), member(C,Cs).
+
+todosLosCaminosHamiltonianos(Bs, C):- caminoSimple(Bs, O, D, _), caminoHamiltoniano(Bs, O, D, C).
