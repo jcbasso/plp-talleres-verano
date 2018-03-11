@@ -47,6 +47,18 @@ borrarTodasLasBicisendasDe([bicisenda(E1,E2,D)|Bs], E, [bicisenda(E1,E2,D)|Bss])
 borrarTodasLasBicisendasDe([bicisenda(E,_,_)|Bs], E, Bss):- borrarTodasLasBicisendasDe(Bs, E, Bss).
 borrarTodasLasBicisendasDe([bicisenda(_,E,_)|Bs], E, Bss):- borrarTodasLasBicisendasDe(Bs, E, Bss).
 
+%% Ejercicio 5
+%% mapaValido(+Bs)
+mapaValido(Bs):- mapaNoCiclico(Bs), forall(member(B1, Bs), esValido(B1,Bs)).
+esValido(B1,Bs):- forall(member(B2, Bs), ( noFormanCiclosTriviales(B1,B2), conectados(B1,B2,Bs)) ).
+conectados(B1,B2,Bs):- B1==B2; vecinos(B1,B2,Bs) ; (vecinos(B1,X,Bs), conectados(B1,X,Bs)).
+vecinos(B1,B2,M):- member(B1,M),member(B2,M),contiguos(B1,B2).
+contiguos(bicisenda(_,X,_), bicisenda(X,_,_)).
+contiguos(bicisenda(Y,_,_), bicisenda(_,Y,_)).
+noCiclico(bicisenda(X,Y,_)):- X\=Y.
+mapaNoCiclico(M):- forall(member(B,M),noCiclico(B)).
+noFormanCiclosTriviales(bicisenda(X,Y,_), bicisenda(A,B,_)):-Y\=A ; X\=B.
+
 %% Ejercicio 6
 %% caminoHamiltoniano(+Bs, +O, +D, ?C)
 caminoHamiltoniano(Bs, O, D, C):- caminoSimple(Bs, O, D, C), forall(estacion(Bs,E), member(E,C)).
