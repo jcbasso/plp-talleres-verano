@@ -11,18 +11,25 @@ mapaEjemplo([
 %% estaciones2([],[]).
 %% estaciones2([bicisenda(E1,E2,_)|Bs],[E1,E2|Es]):- estaciones2(Bs,Es).
 
-estaciones(M, Es):- setof(E, estacion(M, E), Es).
+estaciones(M, Es):- setof(E, estacionConRepetidos(M, E), Es).
 
 estacionConRepetidos([bicisenda(E1,_,_)|_], E1).
 estacionConRepetidos([bicisenda(_,E2,_)|_], E2).
-estacionConRepetidos([_|Bs], E):- estacion(Bs, E).
+estacionConRepetidos([_|Bs], E):- estacionConRepetidos(Bs, E).
 
 %% Ejercicio 2
 %% estacionesVecinas(+M,  ?E,  ?Es)
 estacionesVecinas(M, E, Es):- setof(Re, estacionVecina(M, E, Re), Es).
 
 estacionVecina(M, E, Re):- dataDeEstaciones(M, E, Re, _).
-estacionVecina(M, E, Re):- dataDeEstaciones(M, Re, E, _).
 
-dataDeEstaciones([bicisenda(E1, E2, L)|_], E1, E2, L).
-dataDeEstaciones([_|Bs], E1, E2, L):- dataDeEstaciones(Bs, E1, E2, L).
+dataDeEstaciones(M, E1, E2, D):- dataDeEstaciones2(M, E1, E2, D).
+dataDeEstaciones(M, E1, E2, D):- dataDeEstaciones2(M, E2, E1, D).
+
+dataDeEstaciones2([bicisenda(E1, E2, D)|_], E1, E2, D).
+dataDeEstaciones2([_|Bs], E1, E2, D):- dataDeEstaciones2(Bs, E1, E2, D).
+
+%% Ejercicio 3
+%% distanciaVecinas(+M, ?E1, ?E2, ?N)
+
+distanciaVecinas(M, E1, E2, D):- dataDeEstaciones(M, E1, E2, D).
