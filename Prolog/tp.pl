@@ -35,7 +35,11 @@ distanciaVecinas(Bs, E1, E2, N):- dataDeEstaciones(Bs, E1, E2, N).
 caminoSimple(Bs, O, D, C):- setof(C2, caminoSimpleConRepetidos(Bs, O, D, C2), C3), member(C,C3).
 
 caminoSimpleConRepetidos(Bs, E, E, [E]):- dataDeEstaciones(Bs, E, _, _).
-caminoSimpleConRepetidos(Bs, O, D, [O| Es]):- dataDeEstaciones(Bs, O, E, _), borrarTodasLasBicisendasDe(Bs, O, Bs2), caminoSimpleConRepetidos(Bs2, E, D, Es).
+caminoSimpleConRepetidos(Bs, O, D, [O| Es]):- 
+		dataDeEstaciones(Bs, O, E, _), 
+		E \= D,
+		borrarTodasLasBicisendasDe(Bs, O, Bs2), 
+		caminoSimpleConRepetidos(Bs2, E, D, Es).
 caminoSimpleConRepetidos(Bs, O, D, [O, D]):- dataDeEstaciones(Bs, O, D, _).
 
 borrarTodasLasBicisendasDe([], _, []).
@@ -52,3 +56,26 @@ caminoHamiltoniano(Bs, O, D, C):- caminoSimple(Bs, O, D, C), forall(estacion(Bs,
 caminosHamiltonianos(Bs, C):- setof(C2, todosLosCaminosHamiltonianos(Bs,C2), Cs), member(C,Cs).
 
 todosLosCaminosHamiltonianos(Bs, C):- caminoSimple(Bs, O, D, _), caminoHamiltoniano(Bs, O, D, C).
+
+%% Ejercicio 8
+%% caminoMinimo(+Bs, +O, +D, ?C, ?N)
+caminoMinimo(Bs, O, D, C, N):- 
+		caminoSimpleConDistancia(Bs, O, D, C, N),
+		forall(
+			(
+				caminoSimpleConDistancia(Bs, O, D, C2, N2),
+				C2 \= C
+			),
+				N =< N2
+		).
+
+caminoSimpleConDistancia(Bs, O, D, C, N):- setof(C2, caminoSimpleConDistanciaConRepetidos(Bs, O, D, C2, N), C3), member(C,C3).
+
+caminoSimpleConDistanciaConRepetidos(Bs, E, E, [E], N):- dataDeEstaciones(Bs, E, _, N).
+caminoSimpleConDistanciaConRepetidos(Bs, O, D, [O| Es], N):- 
+		dataDeEstaciones(Bs, O, E, N2),
+		E \= D,
+		borrarTodasLasBicisendasDe(Bs, O, Bs2), 
+		caminoSimpleConDistanciaConRepetidos(Bs2, E, D, Es, N3), 
+		N is N2 + N3.
+caminoSimpleConDistanciaConRepetidos(Bs, O, D, [O, D], N):- dataDeEstaciones(Bs, O, D, N).
