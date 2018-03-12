@@ -5,6 +5,8 @@ mapaEjemplo([
 
 %% Ejercicio 1
 %% estaciones(+Bs, -Es)
+%% Se define un predicado, que es verdadero en el caso en que Es sea el conjunto de todas las estaciones del papa, sin estacionConRepetidos
+%% Para ello, se utiliza el predicado setof que elimina los repetidos
 estaciones(Bs, Es):- setof(E, estacionConRepetidos(Bs, E), Es).
 
 estacionConRepetidos([bicisenda(E1,_,_)|_], E1).
@@ -20,10 +22,13 @@ estacion(Bs, E):- estaciones(Bs,Es), member(E, Es).
 
 %% Ejercicio 2
 %% estacionesVecinas(+Bs,  ?E,  ?Es)
-estacionesVecinas(Bs, E, Es):- setof(Re, estacionVecina(Bs, E, Re), Es).
+%% Al igual que el Ejercicio anterior, se utiliza setof para definir un conjunto sin ningun 
+%% repetido para las estaciones vecinas de una determinada estacion E
+estacionesVecinas(Bs, E, Es):- setof(Ev, estacionVecina(Bs, E, Ev), Es).
 
-estacionVecina(Bs, E, Re):- dataDeEstaciones(Bs, E, Re, _).
+estacionVecina(Bs, E, Ev):- dataDeEstaciones(Bs, E, Ev, _).
 
+%% Define un predicado en el cual no importa el orden en que se definen las estaciones
 dataDeEstaciones(Bs, E1, E2, N):- member(bicisenda(E1,E2,N),Bs).
 dataDeEstaciones(Bs, E1, E2, N):- member(bicisenda(E2,E1,N),Bs).
 
@@ -33,8 +38,12 @@ distanciaVecinas(Bs, E1, E2, N):- dataDeEstaciones(Bs, E1, E2, N).
 
 %% Ejercicio 4
 %% caminoSimple(+Bs, +O, +D, ?C)
+%% Se utiliza el predicado caminoSimpleConRepetidos para obtener un caminoSimple entre las estaciones O y D;
+%% Luego se utiliza el setof para eliminar las estaciones repetidas y asi obterner el caminoSimple
 caminoSimple(Bs, O, D, C):- setof(C2, caminoSimpleConRepetidos(Bs, O, D, C2), C3), member(C,C3).
 
+%% Define predicados para determinar un camino simple entre un par de estaciones, 
+%% eventualmente se podrian obterner caminos simples con estaciones repetidas
 caminoSimpleConRepetidos(Bs, E, E, [E]):- dataDeEstaciones(Bs, E, _, _).
 caminoSimpleConRepetidos(Bs, O, D, [O| Es]):- 
 		dataDeEstaciones(Bs, O, E, _), 
@@ -50,6 +59,10 @@ borrarTodasLasBicisendasDe([bicisenda(_,E,_)|Bs], E, Bss):- borrarTodasLasBicise
 
 %% Ejercicio 5
 %% mapaValido(+Bs)
+%% Mapa valido define un predicado que se hace verdadero para los mapas cuyas bicisendas no comienzan y terminan en la misma estacion(mapaNoCiclico)
+%% Ademas, pedimos que, para cualquier par de estaciones E1, E2, E1!=E2,
+%% exista un camino simple entre E1 y E2 (Mapa conexo)
+%% Ademas pedimos que E1 y E2 no formen ciclos triviales 
 mapaValido(Bs):- mapaNoCiclico(Bs), forall(estacion(Bs, E), esValido(Bs, E)).
 
 esValido(Bs, E1):- 
@@ -82,6 +95,8 @@ todosLosCaminosHamiltonianos(Bs, C):- caminoSimple(Bs, O, D, _), caminoHamiltoni
 
 %% Ejercicio 8
 %% caminoMinimo(+Bs, +O, +D, ?C, ?N)
+%% Este predicado se vuelve verdadero para el camino simple N con menor distancia entre todos los
+%% caminos simples que unen el Origen y el Destino
 caminoMinimo(Bs, O, D, C, N):- 
 		caminoSimpleConDistancia(Bs, O, D, C, N),
 		forall(
@@ -92,6 +107,8 @@ caminoMinimo(Bs, O, D, C, N):-
 				N =< N2
 		).
 
+%% Al igual que caminoSimple, este predicado es verdadero para un camino simple al cual se le agregan
+%% el costo de dicho camino (distancia)
 caminoSimpleConDistancia(Bs, O, D, C, N):- setof(C2, caminoSimpleConDistanciaConRepetidos(Bs, O, D, C2, N), C3), member(C,C3).
 
 caminoSimpleConDistanciaConRepetidos(Bs, E, E, [E], N):- dataDeEstaciones(Bs, E, _, N).
