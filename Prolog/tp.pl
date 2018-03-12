@@ -1,7 +1,7 @@
 mapaEjemplo([
-      bicisenda(arenales, retiro, 30),
-      bicisenda(arenales, libertad, 20),
-      bicisenda(retiro, libertad, 10)]).
+		bicisenda(arenales, retiro, 30),
+		bicisenda(arenales, libertad, 20),
+		bicisenda(retiro, libertad, 10)]).
 
 %% Ejercicio 1
 %% estaciones(+Bs, -Es)
@@ -12,6 +12,7 @@ estacionConRepetidos([bicisenda(_,E2,_)|_], E2).
 estacionConRepetidos([_|Bs], E):- estacionConRepetidos(Bs, E).
 
 estacion(Bs, E):- estaciones(Bs,Es), member(E, Es).
+
 %% Otra implementacion:
 %% estaciones(Bs, Es):- estaciones2(Bs,L), sort(L,Es).
 %% estaciones2([],[]).
@@ -49,15 +50,25 @@ borrarTodasLasBicisendasDe([bicisenda(_,E,_)|Bs], E, Bss):- borrarTodasLasBicise
 
 %% Ejercicio 5
 %% mapaValido(+Bs)
-mapaValido(Bs):- mapaNoCiclico(Bs), forall(member(B1, Bs), esValido(B1,Bs)).
-esValido(B1,Bs):- forall(member(B2, Bs), ( noFormanCiclosTriviales(B1,B2), conectados(B1,B2,Bs)) ).
-conectados(B1,B2,Bs):- B1==B2; vecinos(B1,B2,Bs) ; (vecinos(B1,X,Bs), conectados(B1,X,Bs)).
-vecinos(B1,B2,M):- member(B1,M),member(B2,M),contiguos(B1,B2).
-contiguos(bicisenda(_,X,_), bicisenda(X,_,_)).
-contiguos(bicisenda(Y,_,_), bicisenda(_,Y,_)).
+mapaValido(Bs):- mapaNoCiclico(Bs), forall(estacion(Bs, E), esValido(Bs, E)).
+
+esValido(Bs, E1):- 
+	forall(
+		(
+			estacion(Bs, E2),
+			E1 \= E2
+		),(
+			noFormanCiclosTriviales(B1,B2),
+			caminoSimple(Bs,E1,E2,_)
+		)
+	).
+
+mapaNoCiclico(Bs):- forall(member(B,Bs),noCiclico(B)).
+
 noCiclico(bicisenda(X,Y,_)):- X\=Y.
-mapaNoCiclico(M):- forall(member(B,M),noCiclico(B)).
-noFormanCiclosTriviales(bicisenda(X,Y,_), bicisenda(A,B,_)):-Y\=A ; X\=B.
+
+noFormanCiclosTriviales(bicisenda(X,Y,_), bicisenda(A,B,_)):-Y\=A.
+noFormanCiclosTriviales(bicisenda(X,Y,_), bicisenda(A,B,_)):-X\=B.
 
 %% Ejercicio 6
 %% caminoHamiltoniano(+Bs, +O, +D, ?C)
